@@ -16,7 +16,8 @@ const PORT = process.env.PORT || 4000;
 const JWT_SECRET = process.env.JWT_SECRET || "doxa_secret";
 
 /* ===================== PATHS ===================== */
-const frontendDir = path.join(__dirname, "../frontend");
+const frontendDir = path.join(__dirname, "frontend");
+const frontendPath = path.join(__dirname, "frontend");
 const uploadDir = path.join(frontendDir, "uploads");
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
