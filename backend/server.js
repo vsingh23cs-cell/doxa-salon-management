@@ -113,6 +113,15 @@ app.get("/api/me", (req, res) => {
     return res.json({ loggedIn: false });
   }
 });
+app.get("/api/db-test", async (req, res) => {
+  try {
+    const [rows] = await pool.query("SELECT 1 as test");
+    res.json({ connected: true, result: rows });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ connected: false, error: err.message });
+  }
+});
 
 app.get("/api/admin/me", (req, res) => {
   try {
