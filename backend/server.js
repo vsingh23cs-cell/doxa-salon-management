@@ -16,26 +16,26 @@ const PORT = process.env.PORT || 4000;
 const JWT_SECRET = process.env.JWT_SECRET || "doxa_secret";
 
 /* ===================== PATHS ===================== */
+// Because Railway Root Directory = backend
 const frontendDir = path.join(__dirname, "frontend");
 
 const uploadDir = path.join(frontendDir, "uploads");
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
 /* ===================== COOKIES ===================== */
-// Railway runs on HTTPS -> set secure true in production
 const isProd = process.env.NODE_ENV === "production";
 
 const cookieOpts = {
   httpOnly: true,
   sameSite: "lax",
-  secure: isProd, // true on Railway, false on localhost
+  secure: isProd, // true on Railway (HTTPS), false on localhost
   maxAge: 1000 * 60 * 60 * 6, // 6 hours
 };
 
 /* ===================== MIDDLEWARE ===================== */
 app.use(
   cors({
-    origin: true, // allow same origin + postman etc (ok for college project)
+    origin: true, // ok for project
     credentials: true,
   })
 );
@@ -43,10 +43,6 @@ app.use(
 app.use(express.json({ limit: "2mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-
-// Serve frontend and uploads
-app.use(express.static(frontendDir));
-app.use("/uploads", express.static(uploadDir));
 
 /* ===================== UPLOAD CONFIG ===================== */
 const upload = multer({
@@ -91,6 +87,17 @@ function requireAdmin(req, res, next) {
 
 /* ===================== BASIC ROUTES ===================== */
 app.get("/api/health", (_, res) => res.json({ ok: true }));
+
+// ✅ DB connectivity test (this is what you were trying)
+app.get("/api/db-test", async (_, res) => {
+  try {
+    const [rows] = await pool.query("SELECT 1 AS test");
+    return res.json({ connected: true, rows });
+  } catch (err) {
+    console.error("DB TEST ERROR:", err);
+    return res.status(500).json({ connected: false, error: err.message });
+  }
+});
 
 app.get("/api/me", (req, res) => {
   try {
@@ -256,7 +263,7 @@ app.post("/api/admin/services", requireAdmin, async (req, res) => {
 
     const [result] = await pool.query(
       "INSERT INTO services (name,category,price,duration_min,description,is_active) VALUES (?,?,?,?,?,?)",
-      [name, category, price, duration_min || null, description || null, is_active ? 1 : 1]
+      [name, category, price, duration_min || null, description || null, is_active ? 1 : 0]
     );
 
     return res.json({ ok: true, id: result.insertId });
@@ -550,7 +557,17 @@ app.get("/api/orders/:id", requireUser, async (req, res) => {
   }
 });
 
-/* ===================== FRONTEND FALLBACK ===================== */
+/* ===================== FRONTEND ===================== */
+// Serve frontend + uploads AFTER API routes (important)
+app.use("/uploads", express.static(uploadDir));
+app.use(express.static(frontendDir));
+
+// Make sure home always loads
+app.get("/", (req, res) => {
+  res.sendFile(path.join(frontendDir, "index.html"));
+});
+
+// SPA fallback LAST
 app.use((req, res) => {
   if (req.path.startsWith("/api")) return res.status(404).json({ error: "Not found" });
   res.sendFile(path.join(frontendDir, "index.html"));
