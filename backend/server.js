@@ -1,4 +1,5 @@
 require("dotenv").config();
+
 const path = require("path");
 const fs = require("fs");
 const express = require("express");
@@ -7,40 +8,46 @@ const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const multer = require("multer");
+
 const pool = require("./db");
 
 const app = express();
 const PORT = process.env.PORT || 4000;
 const JWT_SECRET = process.env.JWT_SECRET || "doxa_secret";
 
-/* ===================== CONFIG ===================== */
+/* ===================== PATHS ===================== */
 const frontendDir = path.join(__dirname, "../frontend");
 const uploadDir = path.join(frontendDir, "uploads");
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
+/* ===================== COOKIES ===================== */
+// Railway runs on HTTPS -> set secure true in production
+const isProd = process.env.NODE_ENV === "production";
+
 const cookieOpts = {
   httpOnly: true,
   sameSite: "lax",
-  secure: false, // set true only if HTTPS
+  secure: isProd, // true on Railway, false on localhost
   maxAge: 1000 * 60 * 60 * 6, // 6 hours
 };
 
 /* ===================== MIDDLEWARE ===================== */
 app.use(
   cors({
-    origin: (origin, cb) => cb(null, true), // allow localhost + same-origin
+    origin: true, // allow same origin + postman etc (ok for college project)
     credentials: true,
   })
 );
-app.use(express.json());
+
+app.use(express.json({ limit: "2mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-/* ===================== STATIC ===================== */
+// Serve frontend and uploads
 app.use(express.static(frontendDir));
 app.use("/uploads", express.static(uploadDir));
 
-/* ===================== UPLOADS ===================== */
+/* ===================== UPLOAD CONFIG ===================== */
 const upload = multer({
   storage: multer.diskStorage({
     destination: uploadDir,
@@ -55,7 +62,6 @@ const upload = multer({
 function setCookie(res, name, value) {
   res.cookie(name, value, cookieOpts);
 }
-
 function clearCookie(res, name) {
   res.clearCookie(name, { ...cookieOpts, maxAge: 0 });
 }
@@ -82,10 +88,9 @@ function requireAdmin(req, res, next) {
   }
 }
 
-/* ===================== HEALTH ===================== */
+/* ===================== BASIC ROUTES ===================== */
 app.get("/api/health", (_, res) => res.json({ ok: true }));
 
-/* ===================== AUTH STATUS ===================== */
 app.get("/api/me", (req, res) => {
   try {
     const token = req.cookies.user_token;
@@ -112,7 +117,6 @@ app.get("/api/admin/me", (req, res) => {
 app.post("/api/users/signup", async (req, res) => {
   try {
     const { name, email, phone, password } = req.body;
-
     if (!name || !email || !password) {
       return res.status(400).json({ error: "Missing fields" });
     }
@@ -244,6 +248,7 @@ app.get("/api/admin/services", requireAdmin, async (_, res) => {
 app.post("/api/admin/services", requireAdmin, async (req, res) => {
   try {
     const { name, category, price, duration_min, description, is_active } = req.body;
+
     if (!name || !category || price == null) {
       return res.status(400).json({ error: "Missing required fields" });
     }
@@ -290,15 +295,14 @@ app.delete("/api/admin/services/:id", requireAdmin, async (req, res) => {
   }
 });
 
-/* ===================== TEAM MEMBERS (uses your table: team_members) ===================== */
+/* ===================== TEAM MEMBERS ===================== */
 app.get("/api/team", async (_, res) => {
   try {
     const [rows] = await pool.query(
       "SELECT id,name,role,specialization,experience_years,rating,photo_url FROM team_members WHERE is_active=1 ORDER BY role,name"
     );
     return res.json(rows);
-  } catch (e) {
-    // don't hard fail frontend
+  } catch {
     return res.json([]);
   }
 });
@@ -386,7 +390,7 @@ app.post("/api/cart/update", requireUser, async (req, res) => {
   }
 });
 
-/* ===================== ORDERS (transaction safe) ===================== */
+/* ===================== ORDERS ===================== */
 app.post("/api/orders", requireUser, upload.single("payment_screenshot"), async (req, res) => {
   const { customer_name, phone, email, address } = req.body;
 
@@ -395,6 +399,7 @@ app.post("/api/orders", requireUser, upload.single("payment_screenshot"), async 
   }
 
   const conn = await pool.getConnection();
+
   try {
     await conn.beginTransaction();
 
@@ -446,7 +451,9 @@ app.post("/api/orders", requireUser, upload.single("payment_screenshot"), async 
   } finally {
     conn.release();
   }
-});/* ===================== APPOINTMENTS ===================== */
+});
+
+/* ===================== APPOINTMENTS ===================== */
 app.post("/api/appointments", async (req, res) => {
   try {
     const { client_name, phone, email, service_id, appt_date, appt_time, notes } = req.body;
@@ -455,7 +462,6 @@ app.post("/api/appointments", async (req, res) => {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
-    // get service name/category for storing (optional but useful)
     const [srows] = await pool.query(
       "SELECT name, category FROM services WHERE id=? LIMIT 1",
       [service_id]
@@ -475,7 +481,7 @@ app.post("/api/appointments", async (req, res) => {
         srows[0].category,
         appt_date,
         appt_time,
-        notes || null
+        notes || null,
       ]
     );
 
@@ -486,8 +492,7 @@ app.post("/api/appointments", async (req, res) => {
   }
 });
 
-/* ===================== ADMIN APPOINTMENTS ===================== */
-app.get("/api/admin/appointments", requireAdmin, async (req, res) => {
+app.get("/api/admin/appointments", requireAdmin, async (_, res) => {
   const [rows] = await pool.query(
     "SELECT * FROM appointments ORDER BY appt_date DESC, appt_time DESC"
   );
@@ -507,14 +512,12 @@ app.patch("/api/admin/appointments/:id/status", requireAdmin, async (req, res) =
   return res.json({ ok: true });
 });
 
-
 /* ===================== ADMIN ORDERS ===================== */
 app.get("/api/admin/orders", requireAdmin, async (_, res) => {
   const [rows] = await pool.query("SELECT * FROM orders ORDER BY created_at DESC");
   return res.json(rows);
 });
 
-// approve/reject (so admin can actually update status)
 app.patch("/api/admin/orders/:id/status", requireAdmin, async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
@@ -527,7 +530,7 @@ app.patch("/api/admin/orders/:id/status", requireAdmin, async (req, res) => {
   await pool.query("UPDATE orders SET status=? WHERE id=?", [status, id]);
   return res.json({ ok: true });
 });
-// Get order status by id (user must be logged in)
+
 app.get("/api/orders/:id", requireUser, async (req, res) => {
   try {
     const { id } = req.params;
@@ -546,10 +549,11 @@ app.get("/api/orders/:id", requireUser, async (req, res) => {
   }
 });
 
-/* ===================== FALLBACK ===================== */
+/* ===================== FRONTEND FALLBACK ===================== */
 app.use((req, res) => {
   if (req.path.startsWith("/api")) return res.status(404).json({ error: "Not found" });
   res.sendFile(path.join(frontendDir, "index.html"));
 });
 
-app.listen(PORT, () => console.log(`✅ Server running on http://localhost:${PORT}`));
+/* ===================== START ===================== */
+app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
