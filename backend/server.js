@@ -17,7 +17,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "doxa_secret";
 
 /* ===================== PATHS ===================== */
 const frontendDir = path.join(__dirname, "frontend");
-const frontendPath = path.join(__dirname, "frontend");
+
 const uploadDir = path.join(frontendDir, "uploads");
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
@@ -47,17 +47,6 @@ app.use(cookieParser());
 // Serve frontend and uploads
 app.use(express.static(frontendDir));
 app.use("/uploads", express.static(uploadDir));
-app.get("/", (req, res) => {
-  res.sendFile(path.join(frontendPath, "index.html"));
-});
-app.use(express.static(frontendPath));
-
-app.get("/debug-files", (req, res) => {
-  res.json({
-    frontendPath,
-    exists: fs.existsSync(path.join(frontendPath, "index.html")),
-  });
-});
 
 /* ===================== UPLOAD CONFIG ===================== */
 const upload = multer({
@@ -111,15 +100,6 @@ app.get("/api/me", (req, res) => {
     return res.json({ loggedIn: true, userId: user.userId });
   } catch {
     return res.json({ loggedIn: false });
-  }
-});
-app.get("/api/db-test", async (req, res) => {
-  try {
-    const [rows] = await pool.query("SELECT 1 as test");
-    res.json({ connected: true, result: rows });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ connected: false, error: err.message });
   }
 });
 
