@@ -47,6 +47,17 @@ app.use(cookieParser());
 // Serve frontend and uploads
 app.use(express.static(frontendDir));
 app.use("/uploads", express.static(uploadDir));
+app.get("/", (req, res) => {
+  res.sendFile(path.join(frontendPath, "index.html"));
+});
+app.use(express.static(frontendPath));
+
+app.get("/debug-files", (req, res) => {
+  res.json({
+    frontendPath,
+    exists: fs.existsSync(path.join(frontendPath, "index.html")),
+  });
+});
 
 /* ===================== UPLOAD CONFIG ===================== */
 const upload = multer({
