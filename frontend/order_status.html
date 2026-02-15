@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Order Status | DOXA</title>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+
+<body>
+  <div class="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="index.html">
+        <img src="assets/logo/doxa-logo.png" alt="DOXA" class="logo"/>
+        <div class="name"><b>DOXA</b><br/><span>SALON • SPA</span></div>
+      </a>
+      <div class="nav-links">
+        <a href="products.html">Products</a>
+        <a href="about.html">About</a>
+        <a href="admin_login.html" class="btn ghost">Admin</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="section-title">
+      <h2>Order Status</h2>
+      <p>Order ID: <span class="gold" id="orderId">—</span></p>
+    </div>
+    <hr class="sep"/>
+
+    <div class="card">
+      <h3 id="statusMsg">Loading...</h3>
+      <p class="small muted" id="statusHint"></p>
+      <div style="margin-top:12px;">
+        <button class="btn ghost" id="refreshBtn">Refresh</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const id = new URLSearchParams(location.search).get("id");
+    const orderIdEl = document.getElementById("orderId");
+    const msgEl = document.getElementById("statusMsg");
+    const hintEl = document.getElementById("statusHint");
+    const refreshBtn = document.getElementById("refreshBtn");
+
+    orderIdEl.textContent = id || "—";
+
+    async function load() {
+      if (!id) {
+        msgEl.textContent = "❌ Missing Order ID in URL";
+        hintEl.textContent = "Open like: order_status.html?id=123";
+        return;
+      }
+
+      msgEl.textContent = "Loading...";
+      hintEl.textContent = "";
+
+      try {
+        const res = await fetch(`/api/orders/${encodeURIComponent(id)}`, { credentials: "include" });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || "Failed to load order");
+
+        const st = data.status || "Processing";
+        if (st === "Approved") msgEl.textContent = "✅ Approved (Payment verified)";
+        else if (st === "Rejected") msgEl.textContent = "❌ Rejected (Payment not verified)";
+        else msgEl.textContent = "⏳ Processing (Waiting for approval)";
+
+        hintEl.textContent = `Last update: ${data.updated_at || "—"}`;
+      } catch (e) {
+        msgEl.textContent = "❌ " + e.message;
+      }
+    }
+
+    refreshBtn.addEventListener("click", load);
+    load();
+  </script>
+</body>
+</html>

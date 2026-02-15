@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Cart | DOXA</title>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+
+<body>
+  <div class="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="index.html">
+        <img src="assets/logo/doxa-logo.png" alt="DOXA" class="logo"/>
+        <div class="name"><b>DOXA</b><br/><span>SALON • SPA</span></div>
+      </a>
+
+      <div class="nav-links">
+        <a href="products.html">Products</a>
+        <a href="explore-services.html">Services</a>
+        <a href="cart.html" class="btn ghost">Cart</a>
+        <a href="order_status.html" class="btn ghost">Order Status</a>
+      </div>
+    </div>
+  </div>
+
+  <main class="container" style="padding:40px 0;">
+    <div class="section-title">
+      <h2>Your Cart</h2>
+      <p class="muted">Review items, change quantity, or remove products.</p>
+    </div>
+
+    <hr class="sep"/>
+
+    <p id="cartMsg" class="small muted"></p>
+    <div id="cartWrap"></div>
+
+    <div style="margin-top:18px; display:flex; gap:12px; flex-wrap:wrap;">
+      <a class="btn btn-primary" href="checkout.html">Proceed to Checkout</a>
+      <a class="btn ghost" href="products.html">Continue Shopping</a>
+    </div>
+  </main>
+
+  <script src="js/cart.js"></script>
+</body>
+</html>

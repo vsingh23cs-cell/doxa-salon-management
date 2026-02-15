@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Login | DOXA</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body data-page="login">
+  <div class="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="index.html">
+        <img src="assets/logo/doxa-logo.png" alt="DOXA" class="logo"/>
+        <div class="name"><b>DOXA</b><br/><span>SALON • SPA</span></div>
+      </a>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="products.html">Products</a>
+        <a href="about.html">About</a>
+      </div>
+    </div>
+  </div>
+
+  <main class="container" style="padding:40px 0;">
+    <div class="section-title">
+      <h2>Welcome to DOXA</h2>
+      <p class="muted">Login or create an account to continue.</p>
+    </div>
+    <hr class="sep"/>
+
+    <section class="grid-2">
+      <!-- USER LOGIN -->
+      <div class="card pad">
+        <h2>User Login</h2>
+        <p class="muted">Already have an account? Login here.</p>
+
+        <label class="field">
+          <span>Email</span>
+          <input id="userLoginEmail" type="email" placeholder="you@gmail.com" />
+        </label>
+
+        <label class="field">
+          <span>Password</span>
+          <input id="userLoginPassword" type="password" placeholder="••••••••" />
+        </label>
+
+        <div class="row">
+          <button id="userLoginBtn" class="btn btn-primary" type="button">Login</button>
+          <span id="userLoginMsg" class="small muted"></span>
+        </div>
+      </div>
+
+      <!-- USER SIGNUP -->
+      <div class="card pad">
+        <h2>User Sign Up</h2>
+        <p class="muted">New here? Create an account in 30 seconds.</p>
+
+        <label class="field">
+          <span>Name</span>
+          <input id="userName" type="text" placeholder="Your Name" />
+        </label>
+
+        <label class="field">
+          <span>Email</span>
+          <input id="userEmail" type="email" placeholder="you@gmail.com" />
+        </label>
+
+        <label class="field">
+          <span>Phone (optional)</span>
+          <input id="userPhone" type="text" placeholder="9876543210" />
+        </label>
+
+        <label class="field">
+          <span>Password</span>
+          <input id="userPassword" type="password" placeholder="Create a password" />
+        </label>
+
+        <div class="row">
+          <button id="userSignupBtn" class="btn btn-primary" type="button">Sign Up</button>
+          <span id="userSignupMsg" class="small muted"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ADMIN LOGIN -->
+    <section class="card pad" style="margin-top:18px;">
+      <h2>Admin Login</h2>
+      <p class="muted">Admins login with username + password.</p>
+
+      <div class="grid-2">
+        <label class="field">
+          <span>Username</span>
+          <input id="adminUsername" type="text" placeholder="admin" />
+        </label>
+
+        <label class="field">
+          <span>Password</span>
+          <input id="adminPassword" type="password" placeholder="••••••••" />
+        </label>
+      </div>
+
+      <div class="row">
+        <button id="adminLoginBtn" class="btn btn-soft" type="button">Login as Admin</button>
+        <span id="adminLoginMsg" class="small muted"></span>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/login.js"></script>
+</body>
+</html>

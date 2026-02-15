@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Admin Dashboard | DOXA</title>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+
+<body>
+  <div class="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="admin-dashboard.html">
+        <img src="assets/logo/doxa-logo.png" alt="DOXA" class="logo"/>
+        <div class="name"><b>DOXA</b><br/><span>SALON • SPA</span></div>
+      </a>
+
+      <div class="nav-links">
+        <button class="btn ghost" id="logoutBtn" type="button">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container" style="padding:40px 0;">
+    <div class="section-title">
+      <h2>Admin Dashboard</h2>
+      <p>Manage services, appointments & orders.</p>
+    </div>
+    <hr class="sep"/>
+
+    <!-- SERVICES -->
+    <div class="row" style="align-items:center; justify-content:space-between; gap:12px; margin:10px 0;">
+      <h3 style="margin:0;">Services</h3>
+      <a class="btn btn-primary" href="admin-add-service.html">+ Add Service</a>
+    </div>
+    <div id="serviceGrid" class="grid"></div>
+
+    <hr class="sep" style="margin:26px 0;"/>
+
+    <!-- APPOINTMENTS -->
+    <h3 style="margin:10px 0;">Appointments</h3>
+    <div id="apptGrid" class="grid"></div>
+
+    <hr class="sep" style="margin:26px 0;"/>
+
+    <!-- ORDERS -->
+    <h3 style="margin:10px 0;">Orders</h3>
+    <div id="orderGrid" class="grid"></div>
+  </div>
+
+  <script src="js/admin-dashboard.js"></script>
+</body>
+</html>

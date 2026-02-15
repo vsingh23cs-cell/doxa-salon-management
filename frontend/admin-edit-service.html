@@ -1,0 +1,119 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Book Appointment | DOXA</title>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+  <div class="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="index.html">
+        <img src="assets/logo/doxa-logo.png" alt="DOXA" class="logo"/>
+        <div class="name"><b>DOXA</b><br/><span>SALON • SPA</span></div>
+      </a>
+      <div class="nav-links">
+        <a href="services.html">Services</a>
+        <a href="appointment.html" class="btn">Book Appointment</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="section-title">
+      <h2>Book Appointment</h2>
+      <p>Quick booking — we’ll confirm shortly.</p>
+    </div>
+    <hr class="sep"/>
+
+    <form id="form" class="form">
+      <label>Your Name</label>
+      <input class="input" name="client_name" required />
+
+      <div class="row">
+        <div>
+          <label>Phone</label>
+          <input class="input" name="phone" required />
+        </div>
+        <div>
+          <label>Email (optional)</label>
+          <input class="input" name="email" type="email" />
+        </div>
+      </div>
+
+      <label>Service</label>
+      <select class="input" name="service_id" id="serviceSelect" required>
+        <option value="">Loading services...</option>
+      </select>
+
+      <div class="row">
+        <div>
+          <label>Date</label>
+          <input class="input" name="appt_date" type="date" required />
+        </div>
+        <div>
+          <label>Time</label>
+          <input class="input" name="appt_time" type="time" required />
+        </div>
+      </div>
+
+      <label>Notes (optional)</label>
+      <textarea class="input" name="notes" rows="3"></textarea>
+
+      <div style="margin-top:14px; display:flex; gap:12px; flex-wrap:wrap;">
+        <button class="btn" type="submit">Confirm Booking</button>
+        <span id="msg" class="small"></span>
+      </div>
+    </form>
+  </div>
+
+  <script type="module">
+    import { getServices, bookAppointment } from "./js/app.js";
+
+    const sel = document.getElementById("serviceSelect");
+    const msg = document.getElementById("msg");
+
+    // Load services into dropdown
+    try {
+      const services = await getServices();
+      sel.innerHTML = `<option value="">Select a service</option>`;
+
+      services.forEach(s => {
+        const opt = document.createElement("option");
+        opt.value = s.id;
+        opt.textContent = `${s.category} • ${s.name} (₹${s.price})`;
+        sel.appendChild(opt);
+      });
+    } catch (err) {
+      sel.innerHTML = `<option value="">❌ Start backend to load services</option>`;
+    }
+
+    // Submit booking
+    document.getElementById("form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      msg.textContent = "Booking...";
+
+      const f = e.target;
+      const payload = {
+        client_name: f.client_name.value.trim(),
+        phone: f.phone.value.trim(),
+        email: f.email.value.trim(),
+        service_id: Number(f.service_id.value),
+        appt_date: f.appt_date.value,
+        appt_time: f.appt_time.value,
+        notes: f.notes.value.trim(),
+      };
+
+      try {
+        const r = await bookAppointment(payload);
+        msg.textContent = `✅ Booked! ID: ${r.id} • Status: ${r.status}`;
+        f.reset();
+      } catch (err) {
+        msg.textContent = `❌ ${err.message}`;
+      }
+    });
+  </script>
+
+</body>
+</html>

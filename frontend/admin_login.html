@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Admin Login | DOXA</title>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+
+<body>
+  <!-- NAV -->
+  <div class="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="login.html">
+        <img src="assets/logo/doxa-logo.png" alt="DOXA" class="logo"/>
+        <div class="name"><b>DOXA</b><br/><span>SALON • SPA</span></div>
+      </a>
+      <div class="nav-links">
+        <a href="login.html" class="btn ghost">Back</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="container" style="padding:48px 0;">
+    <div class="section-title">
+      <h2>Admin Login</h2>
+      <p>Enter admin credentials.</p>
+    </div>
+    <hr class="sep"/>
+
+    <div class="card" style="max-width:520px;">
+      <label for="u">Username</label>
+      <input class="input" id="u" placeholder="admin" autocomplete="username"/>
+
+      <label for="p">Password</label>
+      <input class="input" id="p" type="password" placeholder="••••••••" autocomplete="current-password"/>
+
+      <p id="msg" class="small" style="margin-top:10px;"></p>
+
+      <div style="margin-top:14px;">
+        <button class="btn" id="loginBtn" type="button">Login</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- must be normal script (not module) -->
+  <script src="js/admin-login.js"></script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Book Appointment | DOXA</title>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+
+<body>
+  <div class="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="index.html">
+        <img src="assets/logo/doxa-logo.png" alt="DOXA" class="logo"/>
+        <div class="name"><b>DOXA</b><br/><span>SALON • SPA</span></div>
+      </a>
+      <div class="nav-links">
+        <a href="services.html">Services</a>
+        <a href="appointment.html" class="btn">Book Appointment</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="section-title">
+      <h2>Book Appointment</h2>
+      <p>Quick booking — we’ll confirm shortly.</p>
+    </div>
+    <hr class="sep"/>
+
+    <form id="form" class="form">
+      <label for="client_name">Your Name</label>
+      <input id="client_name" class="input" name="client_name" required />
+
+      <div class="row">
+        <div>
+          <label for="phone">Phone</label>
+          <input id="phone" class="input" name="phone" required />
+        </div>
+        <div>
+          <label for="email">Email (optional)</label>
+          <input id="email" class="input" name="email" type="email" />
+        </div>
+      </div>
+
+      <label for="serviceSelect">Service</label>
+      <select class="input" name="service_id" id="serviceSelect" required>
+        <option value="">Loading services...</option>
+      </select>
+
+      <div class="row">
+        <div>
+          <label for="appt_date">Date</label>
+          <input id="appt_date" class="input" name="appt_date" type="date" required />
+        </div>
+        <div>
+          <label for="appt_time">Time</label>
+          <input id="appt_time" class="input" name="appt_time" type="time" required />
+        </div>
+      </div>
+
+      <label for="notes">Notes (optional)</label>
+      <textarea id="notes" class="input" name="notes" rows="3"></textarea>
+
+      <div style="margin-top:14px; display:flex; gap:12px; flex-wrap:wrap;">
+        <button class="btn" type="submit">Confirm Booking</button>
+        <span id="msg" class="small"></span>
+      </div>
+    </form>
+  </div>
+
+  <script src="js/appointment.js"></script>
+</body>
+</html>
